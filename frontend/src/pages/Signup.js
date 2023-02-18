@@ -1,35 +1,24 @@
 import { useState } from "react"
+import config from "./../config";
+import axios from "axios";
+
+const url = config.backendUrl;
 
 function SignUp(){
     let [ data, setData ] = useState({
         username: ""
         , password1 : ""
         , password2 : ""
-        , mobile : ""
     })
 
     let [ error, setError ] = useState({
         username: false
         , password1 : false
         , password2 : false
-        , mobile : false
     })
 
-    let handleSubmit = (e) => {
-        e.preventDefault();
-
-        console.log("submitted")
-    }
-
-    let handleChange = (e) => {
-        let {name, value} = e.target;
-
-        setData({...data, [name]:value})
-    }
-
-    // validation
-    let handleBlur = (e) => {
-        let {name, value} = e.target;
+    
+    let validate = (name, value, allowSubmitCounter = 0) => {
         let counter = 0;
 
         if(name === "username"){
@@ -77,7 +66,7 @@ function SignUp(){
             let contact = data.mobile
 
             if(value.length === 0){
-                setError({...error, [name]:"Password can't be blank."})
+                setError({...error, [name]:"Number can't be blank."})
                 ++counter
             }
 
@@ -92,9 +81,53 @@ function SignUp(){
 
         }
 
+        
         if(counter === 0){
             setError({...error, [name]:false})
         }
+
+        allowSubmitCounter += counter;
+
+        return allowSubmitCounter;
+    }
+
+    let checkInputs = () => {
+        let allowSubmitCounter = 0;
+
+        for(var i in data){
+            console.log(i, data[i])
+            allowSubmitCounter +=validate(i, data[i], allowSubmitCounter)
+        }
+
+        //if 0 error, allow add
+        if(allowSubmitCounter === 0){
+            axios.post(url+"/user/add")
+                .then( data => {
+                    console.log(data)
+                })
+                .catch( err => {
+                    console.log("err", err)
+                })
+        }
+    }
+
+    let handleSubmit = (e) => {
+        e.preventDefault();
+
+        checkInputs();
+        console.log("submitted")
+    }
+
+    let handleChange = (e) => {
+        let {name, value} = e.target;
+
+        setData({...data, [name]:value})
+    }
+
+    let handleBlur = (e) => {
+        let {name, value} = e.target;
+
+        validate(name, value)
     }
 
     return (
@@ -122,13 +155,13 @@ function SignUp(){
                         <input type="password" name="password2"  onBlur={ handleBlur }  onChange={ handleChange } value={ data.password2 } placeholder="Password..."/>
                     </div>
                 </fieldset>
-                <fieldset  className={ error.mobile !== false ? "error" : ""}>
+                {/* <fieldset  className={ error.mobile !== false ? "error" : ""}>
                     <label>Mobile #</label>
                     <div>
                         <p>{ error.mobile }</p>
                         <input type="number" name="mobile"  onBlur={ handleBlur }  onChange={ handleChange } value={ data.mobile } placeholder="Mobile #..."/>
                     </div>
-                </fieldset>
+                </fieldset> */}
                 <fieldset className="btn-container">
                     <input type="submit" className="btn" value="Register"/>
                 </fieldset>
