@@ -1,35 +1,38 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const mysql = require('mysql')
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'pos'
-})
+const helmet = require("helmet");
+const morgan = require("morgan");
+const bodyParser = require("body-parser");
+const userModel = require("./models/userModel");
 
-connection.connect()
+// adding Helmet to enhance your API's security
+app.use(helmet());
 
-connection.query('SELECT * from user', (err, rows, fields) => {
-if (err) throw err
+// using bodyParser to parse JSON bodies into JS objects
+app.use(bodyParser.json());
 
-console.log('The solution is: ', rows[0].solution)
-})
-
-connection.end()
-
+// enabling CORS for all requests
 app.use(cors());
 
-app.get("/", function(req, res){
-    res.send("hello world")
+// adding morgan to log HTTP requests
+// app.use(morgan('combined'));
+
+app.get("/", async function(req, res){
+    res.send("API is Up")
 });
-app.post("/user/add", (req,res) => {
-    // console.log(req.body)   
 
+app.post("/user/add", async (req,res) => {
+    let isAdded =  await userModel.validate(req.body);
 
-    res.send("hello")
-})
+    res.send({ added : isAdded})
+});
+
+app.post("/user/login", async (req,res) => {
+    let allow = await userModel.login(req.body);
+
+    res.send({ allow : allow})
+});
 
 app.listen(9000, function(){
     console.log("app is listening to port 9000");

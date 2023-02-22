@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import config from "./../config";
 import axios from "axios";
 
@@ -11,6 +12,8 @@ function SignUp(){
         , password2 : ""
     })
 
+    let [added, setAdded ] = useState(false)
+
     let [ error, setError ] = useState({
         username: false
         , password1 : false
@@ -18,92 +21,84 @@ function SignUp(){
     })
 
     
-    let validate = (name, value, allowSubmitCounter = 0) => {
-        let counter = 0;
-
+    let validate = (name, value, err, countError = false) => {
         if(name === "username"){
             if(value.length < 6){
-                setError({...error, [name]:"Username is too short."})
-                ++counter
+                err[name] = "Username is too short."
+
+                countError += (countError !== false) ? 1 : 0;
             }
 
+
             if(value.length === 0){
-                setError({...error, [name]:"Please enter username."})
-                ++counter
+                err[name] = "Please enter username."
+                countError += (countError !== false) ? 1 : 0;
             }
         }
 
         if(name === "password1"){
             if(value.length < 6){
-                setError({...error, [name]:"Password is too short."})
-                ++counter
+                err[name] = "Password is too short."
+                countError += (countError !== false) ? 1 : 0;
             }
 
             if(value.length === 0){
-                setError({...error, [name]:"Password can't be blank."})
-                ++counter
+                err[name] = "Password can't be blank."
+                countError += (countError !== false) ? 1 : 0;
             }
         }
 
         if(name === "password2"){
             if(value.length < 6){
-                setError({...error, [name]:"Password is too short."})
-                ++counter
+                err[name] = "Password is too short."
+                countError += (countError !== false) ? 1 : 0;
             }
 
             if(value.length === 0){
-                setError({...error, [name]:"Password can't be blank."})
-                ++counter
+                err[name] = "Password can't be blank."
+                countError += (countError !== false) ? 1 : 0;
             }
 
             if(data.password1 !== data.password2){
-                setError({...error, [name]:"Passwords must be the same."})
-                ++counter
+                err[name] = "Passwords must be the same."
+                countError += (countError !== false) ? 1 : 0;
             }
         }
 
-        if(name === "mobile"){
-            let contact = data.mobile
+        setError(err)
 
-            if(value.length === 0){
-                setError({...error, [name]:"Number can't be blank."})
-                ++counter
-            }
-
-            if(value.length <11 ){
-                setError({...error, [name]:"Number is too short"})
-                ++counter
-            }
-            if(contact.isInteger === false){
-                setError({...error, [name]:"Invalid Mobile Number..."})
-                ++counter
-            }
-
+        if(countError !== false){
+            return countError;
         }
-
-        
-        if(counter === 0){
-            setError({...error, [name]:false})
-        }
-
-        allowSubmitCounter += counter;
-
-        return allowSubmitCounter;
     }
 
     let checkInputs = () => {
-        let allowSubmitCounter = 0;
+        let err = {
+            username: false
+            , password1 : false
+            , password2 : false
+        }
+        let errorCount = 0;
+
 
         for(var i in data){
-            console.log(i, data[i])
-            allowSubmitCounter +=validate(i, data[i], allowSubmitCounter)
+            errorCount += validate(i, data[i], err, errorCount)
         }
 
         //if 0 error, allow add
-        if(allowSubmitCounter === 0){
-            axios.post(url+"/user/add")
-                .then( data => {
-                    console.log(data)
+        if(errorCount === 0){
+            console.clear();
+            axios.post(url+"/user/add", data)
+                .then( response => {
+                    console.log(response.data.added)
+                    if(response.data.added === false){
+                        setError(prev => ({
+                            ...prev, username : "Username is already in use"
+                        }))
+                        setAdded(false)
+                    } else {
+                        setAdded(true)
+                    }
                 })
                 .catch( err => {
                     console.log("err", err)
@@ -115,7 +110,6 @@ function SignUp(){
         e.preventDefault();
 
         checkInputs();
-        console.log("submitted")
     }
 
     let handleChange = (e) => {
@@ -126,13 +120,19 @@ function SignUp(){
 
     let handleBlur = (e) => {
         let {name, value} = e.target;
+        let err = {
+            username: false
+            , password1 : false
+            , password2 : false
+        }
 
-        validate(name, value)
+        validate(name, value, err)
     }
 
     return (
         <>
             <h3>Create an account</h3>
+            { added && <p className="success">You have successfully created an account. Click <Link to="/login">here</Link> to login</p>}
             <form  method="post"  onSubmit={ handleSubmit }>
                 <fieldset className={ error.username !== false ? "error" : ""}>
                     <label>Username:</label>
