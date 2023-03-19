@@ -1,0 +1,28 @@
+.none {
+    display: none;
+}
+.block {
+    display: block;
+}
+.flash {
+    width: 50%;
+    margin: 20px auto 0;
+}
+.flash p {
+    padding: 5px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    margin: 20px auto 0;
+    color: white;
+    font-weight: 700;
+    margin: 0 auto;
+    width: initial;
+}
+.success {
+    border: 1px solid green;
+    background-color: #63a475;
+}
+.error {
+    background: #ff7872;
+    border: 1px solid #ffb9b9;
+}

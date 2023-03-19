@@ -1,13 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import FlashMessage from "./FlashMessage";
 import axios from "axios";
 import config from "./../config";
 
 const url = config.backendUrl;
 
-function Login(){
+function Login(props){
+    const navigate = useNavigate();
+    let [msg, setMsg ] = useState("")
     let [ data, setData ] = useState({
         username : ""
         , password : ""
+        , allowed : false
     });
 
     let handleChange = (e) => {
@@ -23,7 +28,15 @@ function Login(){
 
         axios.post(url+"/user/login", data)
             .then( res => {
-                console.log(res)
+                if(res.data != false){
+                    localStorage.setItem("user", res.data);
+                    props.setActiveUser(res.data)
+                    navigate("/")
+                } else {
+                    console.log("Err")
+                    setMsg(<FlashMessage msg="Invalid Login" type="error" cs="block" duration="1000"
+                    />)
+                }
             })
             .catch( err => {
                 console.log("Error", err)
@@ -33,6 +46,7 @@ function Login(){
     return (
         <>
             <h3>Sign In</h3>
+            { msg }
             <form method="post" onSubmit={ handleSubmit }>
                 <fieldset>
                     <label>Username:</label>

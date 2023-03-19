@@ -1,31 +1,59 @@
-import {BrowserRouter as Router,Routes,Route,Link} from 'react-router-dom';
+import { useState } from "react";
+import { Routes,Route,Link} from 'react-router-dom';
+
 import Login from "./pages/Login"
 import Home from "./pages/Home"
 import SignUp from './pages/Signup';
+import Dashboard from './pages/Dashboard';
+import { useNavigate } from "react-router-dom";
+
 import "./css/App.css";
 
 function App(){
+    let [ user,setUser ] = useState(localStorage.getItem("user"))
+    const navigate = useNavigate();
+
+  function logout(e){
+    e.preventDefault();
+
+    localStorage.clear()
+    setUser(null)
+    navigate("/login")  
+     
+  }
+
+  function setActiveUser(data){
+    setUser(data)
+  }
+
   return (
-    <Router>
+    <>
       <header className='container-fluid'>
         <div className='container'>
-          <h1>shop</h1>
+          <h1><Link to="/">Shop</Link> </h1>
           <nav>
-            <Link to="/">Home</Link>
-            <Link to="/signup">Sign Up</Link>
-            <Link to="/login">Login</Link>
+            { user ? 
+            <>
+              <Link to="/dashboard">Dashboard</Link> 
+              <a href="" onClick={ (e) => logout(e)}>logout</a>
+            </> 
+            : 
+            <>
+              <Link to="/">Home</Link><Link to="/login">Login</Link>
+              <Link to="/signup">Sign Up</Link>
+            </> }
           </nav>
         </div>
       </header>
       <div className="container">
         <Routes>
           <Route exact path="/" element={<Home/>}></Route>
-          <Route exact path="/login" element={ <Login/> }></Route>
+          <Route exact path="/login" element={ <Login setActiveUser={ (msg)=> setActiveUser(msg)}/> } ></Route>
           <Route exact path="/signup" element={ <SignUp/>}></Route>
+          <Route exact path="/dashboard" element={ <Dashboard/>}></Route>
         </Routes>
       </div>
-    </Router>
-    
+      </>
   )
 }
 

@@ -97,3 +97,6 @@ fieldset.error input {
 .success a {
   color: link;
 }
+.none {
+  display: none;
+}
