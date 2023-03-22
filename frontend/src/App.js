@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Routes,Route,Link} from 'react-router-dom';
-
+import { useNavigate } from "react-router-dom";
+import Pos from "./Pos";
 import Login from "./pages/Login"
 import Home from "./pages/Home"
 import SignUp from './pages/Signup';
 import Dashboard from './pages/Dashboard';
-import { useNavigate } from "react-router-dom";
 
 import "./css/App.css";
 
@@ -35,6 +35,7 @@ function App(){
             { user ? 
             <>
               <Link to="/dashboard">Dashboard</Link> 
+              <Link to="/pos">POS</Link> 
               <a href="" onClick={ (e) => logout(e)}>logout</a>
             </> 
             : 
@@ -51,6 +52,7 @@ function App(){
           <Route exact path="/login" element={ <Login setActiveUser={ (msg)=> setActiveUser(msg)}/> } ></Route>
           <Route exact path="/signup" element={ <SignUp/>}></Route>
           <Route exact path="/dashboard" element={ <Dashboard/>}></Route>
+          <Route exact path="/pos" element={ <Pos/>}></Route>
         </Routes>
       </div>
       </>

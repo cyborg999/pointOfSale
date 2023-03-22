@@ -90,7 +90,6 @@ async function findOne(data){
     let valid = false;
 
     if(row.length > 0){
-        let password = row[0]['password'];
         const verified = bcrypt.compareSync(data['password'], hash);
 
         if(verified){

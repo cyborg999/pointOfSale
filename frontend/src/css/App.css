@@ -3,6 +3,9 @@ header .container {
   flex-direction: row;
   justify-content: space-between;
 }
+.container.block {
+  display: block;
+}
 header h1 {
   display: block;
   font-style: italic;
@@ -99,4 +102,10 @@ fieldset.error input {
 }
 .none {
   display: none;
+}
+.sec_left {
+  width: 50%;
+}
+.sec_right {
+  width: 50%;
 }

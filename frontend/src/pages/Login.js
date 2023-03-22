@@ -29,7 +29,7 @@ function Login(props){
         axios.post(url+"/user/login", data)
             .then( res => {
                 if(res.data != false){
-                    localStorage.setItem("user", res.data);
+                    localStorage.setItem("user", JSON.stringify(res.data));
                     props.setActiveUser(res.data)
                     navigate("/")
                 } else {

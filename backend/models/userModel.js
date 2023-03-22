@@ -39,7 +39,11 @@ async function login(data){
         const verified = bcrypt.compareSync(data.password, row[0].password);
 
         if(verified){
-            valid = row[0]['id'];
+            valid = {
+                id : row[0].id
+                , username : row[0].username
+                , usertype : row[0].usertype
+            };
         }
     }
 
